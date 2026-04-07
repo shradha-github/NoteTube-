@@ -1,4 +1,4 @@
-#from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi import APIRouter
 from pydantic import BaseModel
 from transcript import get_transcript
