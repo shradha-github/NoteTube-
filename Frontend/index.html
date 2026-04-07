@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoteTube | AI Video Summarizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h2>NoteTube Generator</h2>
+        
+        <div class="input-group">
+            <input type="text" id="url" placeholder="Paste YouTube link (e.g., https://youtube.com/...)">
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-generate" onclick="generateNotes()">
+                Generate Notes
+            </button>
+            <button class="btn-secondary" onclick="downloadPDF()">
+                Download PDF
+            </button>
+        </div>
+
+        <div class="output-header">
+            <span class="output-label">Resulting Notes</span>
+            <button class="btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="copyToClipboard()">
+                Copy Text
+            </button>
+        </div>
+
+        <pre id="output">Your AI-generated notes will appear here...</pre>
+
+        <footer>Powered by your Render API</footer>
+    </div>
+
+    <script>
+        // Configuration: Change this to your actual Render URL
+        const API_URL = "https://your-backend.onrender.com";
+
+        async function generateNotes() {
+            const urlInput = document.getElementById("url");
+            const outputElement = document.getElementById("output");
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                alert("Please paste a valid YouTube URL first.");
+                return;
+            }
+
+            // Visual Feedback
+            outputElement.innerText = "⏳ Processing video... This can take up to a minute. Please stay on this page.";
+            outputElement.style.color = "#6b7280";
+
+            try {
+                const response = await fetch(`${API_URL}/generate-notes`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ youtube_url: url })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Success: Display notes
+                outputElement.innerText = data.notes;
+                outputElement.style.color = "#374151";
+
+            } catch (error) {
+                console.error("Error:", error);
+                outputElement.innerText = "❌ Error: Failed to generate notes. Check your backend connection.";
+                outputElement.style.color = "#ef4444";
+            }
+        }
+
+        function downloadPDF() {
+            const url = document.getElementById("url").value.trim();
+            if (!url) {
+                alert("Please paste a URL first.");
+                return;
+            }
+            // Opens the PDF route with the URL as a query parameter
+            window.open(`${API_URL}/download-pdf?youtube_url=${encodeURIComponent(url)}`, "_blank");
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById("output").innerText;
+            if (text.includes("Your AI-generated notes") || text === "") return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Notes copied to clipboard!");
+            });
+        }
+    </script>
+
+</body>
+</html>
