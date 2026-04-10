@@ -8,7 +8,7 @@ client = OpenAI(
 )
 
 def generate_notes(transcript_text):
-    if transcript_text == "No transcript available" or len(transcript_text.strip()) < 50:
+    if transcript_text ==None  or len(transcript_text.strip()) < 50:
         return "Transcript not available to convert into notes."
 
     transcript_text = transcript_text[:3000]
