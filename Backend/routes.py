@@ -20,9 +20,9 @@ def generate_notes_api(data: YouTubeRequest):
 
     transcript_text = get_transcript(video_id)
 
-    if transcript_text == None:
+    if transcript_text == "No transcript available":
         return {"status": "error", "message": "No transcript available"}
-        
+
     notes = generate_notes(transcript_text)
 
     return {
